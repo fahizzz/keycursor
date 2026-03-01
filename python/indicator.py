@@ -17,6 +17,7 @@ class TopBarIndicator:
         self.gtk_ready = False
         self.acceleration_enabled = True
         self.precision_mode = False
+        self._blink_thread: threading.Thread | None = None
 
         self.gtk_thread = threading.Thread(target=self._run_gtk, daemon=True)
         self.gtk_thread.start()
@@ -28,6 +29,10 @@ class TopBarIndicator:
 
         if not self.gtk_ready:
             print("[INDICATOR] WARNING: GTK thread timed out")
+
+    # ------------------------------------------------------------------ #
+    #  Public API                                                          #
+    # ------------------------------------------------------------------ #
 
     def show(self):
         if not self.window or self.visible:
@@ -51,8 +56,38 @@ class TopBarIndicator:
         if self.window and self.visible:
             GLib.idle_add(self.window.queue_draw)
 
+    def blink_red(self, times=6, interval=0.1):
+        """Blink red bar N times — used for passthrough mode reminder."""
+        if self._blink_thread and self._blink_thread.is_alive():
+            return  # Already blinking
+        self._blink_thread = threading.Thread(
+            target=self._blink_loop,
+            args=(times, interval),
+            daemon=True
+        )
+        self._blink_thread.start()
+
+    # ------------------------------------------------------------------ #
+    #  Internal                                                            #
+    # ------------------------------------------------------------------ #
+
+    def _blink_loop(self, times, interval):
+        for _ in range(times):
+            GLib.idle_add(self._show_red)
+            time.sleep(interval)
+            GLib.idle_add(self._do_hide)
+            time.sleep(interval)
+
+    def _show_red(self):
+        if self.window:
+            self.window._color = 'red'
+            self.window.show_all()
+            self.window.queue_draw()
+        return False
+
     def _do_show(self):
         if self.window:
+            self.window._color = None  # Use normal color logic
             self.window.show_all()
         return False
 
@@ -71,6 +106,7 @@ class TopBarIndicator:
         class IndicatorWindow(Gtk.Window):
             def __init__(self):
                 super().__init__()
+                self._color: str | None = None  # None = use mode-based color, 'red' = override
 
                 GtkLayerShell.init_for_window(self)
                 GtkLayerShell.set_layer(self, GtkLayerShell.Layer.OVERLAY)
@@ -100,15 +136,14 @@ class TopBarIndicator:
             def on_draw(self, widget, cr):
                 allocation = widget.get_allocation()
 
-                if indicator.precision_mode:
-                    # Green = precision mode
-                    cr.set_source_rgba(0.2, 0.85, 0.3, 1.0)
+                if self._color == 'red':
+                    cr.set_source_rgba(1.0, 0.1, 0.1, 1.0)
+                elif indicator.precision_mode:
+                    cr.set_source_rgba(0.2, 0.85, 0.3, 1.0)   # Green
                 elif indicator.acceleration_enabled:
-                    # White = normal mode with accel ON
-                    cr.set_source_rgba(1.0, 1.0, 1.0, 1.0)
+                    cr.set_source_rgba(1.0, 1.0, 1.0, 1.0)    # White
                 else:
-                    # Blue = accel OFF
-                    cr.set_source_rgba(0.2, 0.5, 1.0, 1.0)
+                    cr.set_source_rgba(0.2, 0.5, 1.0, 1.0)    # Blue
 
                 cr.rectangle(0, 0, allocation.width, allocation.height)
                 cr.fill()
