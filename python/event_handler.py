@@ -1,4 +1,26 @@
+import threading
+from pathlib import Path
 from evdev import ecodes
+
+import settings as settings_module
+
+# Sound file path
+SOUND_PATH = Path(__file__).parent.parent / 'assets' / 'change_mode.wav'
+
+
+def _play_sound():
+    """Play sound in a daemon thread — never blocks event handling."""
+    def _play():
+        try:
+            import subprocess
+            subprocess.Popen(
+                ['aplay', '-q', str(SOUND_PATH)],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+        except Exception:
+            pass
+    threading.Thread(target=_play, daemon=True).start()
 
 
 class EventHandler:
@@ -9,8 +31,22 @@ class EventHandler:
         self.ui = None
 
         self.mouse_mode = False
-        self.passthrough_mode = False  # When True, all keys pass through untouched
+        self.passthrough_mode = False
         self.modifiers_held = set()
+
+        # Load saved settings
+        saved = settings_module.load()
+        self.mouse_ops.base_speed = saved['base_speed']
+        self.mouse_ops.acceleration_enabled = saved['acceleration_enabled']
+        self.passthrough_mode = saved['passthrough_mode']
+
+        if self.passthrough_mode:
+            print(f"[SETTINGS] Restored passthrough mode: ON")
+        print(f"[SETTINGS] Restored speed: {self.mouse_ops.base_speed}, accel: {self.mouse_ops.acceleration_enabled}")
+
+        # Sync indicator color with restored settings
+        if self.indicator:
+            self.indicator.set_acceleration(self.mouse_ops.acceleration_enabled)
 
         self.speed_levels = {
             ecodes.KEY_1: 2,
@@ -44,6 +80,13 @@ class EventHandler:
             ecodes.KEY_LEFTSHIFT, ecodes.KEY_RIGHTSHIFT
         }
 
+    def _save(self):
+        settings_module.save({
+            'base_speed': self.mouse_ops.base_speed,
+            'acceleration_enabled': self.mouse_ops.acceleration_enabled,
+            'passthrough_mode': self.passthrough_mode,
+        })
+
     # ------------------------------------------------------------------ #
     #  Mode helpers                                                        #
     # ------------------------------------------------------------------ #
@@ -73,15 +116,18 @@ class EventHandler:
         print("Mouse mode: OFF")
 
     def enter_passthrough(self):
-        """Fully disable mouse layer — all keys pass through untouched."""
         if self.mouse_mode:
             self.exit_mouse_mode()
         self.passthrough_mode = True
         self.modifiers_held.clear()
+        _play_sound()
+        self._save()
         print("Passthrough mode: ON (Ctrl+CapsLock to disable)")
 
     def exit_passthrough(self):
         self.passthrough_mode = False
+        _play_sound()
+        self._save()
         print("Passthrough mode: OFF")
 
     # ------------------------------------------------------------------ #
@@ -95,18 +141,17 @@ class EventHandler:
         keycode = event.code
         value = event.value  # 0=up, 1=down, 2=repeat
 
-        # ---- Track modifiers always, even in passthrough ----
+        # Track modifiers always
         if keycode in self.modifier_keys:
             if value == 1:
                 self.modifiers_held.add(keycode)
             elif value == 0:
                 self.modifiers_held.discard(keycode)
-            # Always pass modifiers through
             return True
 
         ctrl_held = bool(self.modifiers_held & {ecodes.KEY_LEFTCTRL, ecodes.KEY_RIGHTCTRL})
 
-        # ---- Ctrl + CapsLock: toggle passthrough mode ----
+        # Ctrl + CapsLock: toggle passthrough
         if keycode == ecodes.KEY_CAPSLOCK and ctrl_held and value == 1:
             if self.passthrough_mode:
                 self.exit_passthrough()
@@ -116,18 +161,14 @@ class EventHandler:
 
         # ---- Passthrough mode ----
         if self.passthrough_mode:
-            # CapsLock alone: blink red bar as reminder, but block the key
             if keycode == ecodes.KEY_CAPSLOCK:
                 if value == 1 and self.indicator:
                     self.indicator.blink_red(times=6, interval=0.08)
-                return False  # Never pass CapsLock through in passthrough mode
-            return True  # Everything else passes through
+                return False  # Block CapsLock entirely
+            return True
 
-        # ---- Normal / mouse mode handling ----
-
-        # CapsLock alone toggles mouse mode
+        # ---- CapsLock: toggle mouse mode ----
         if keycode == ecodes.KEY_CAPSLOCK and value == 1:
-            # Release all held keys to prevent stuck keys
             if self.ui:
                 for key in range(ecodes.KEY_MAX):
                     try:
@@ -157,7 +198,7 @@ class EventHandler:
 
         # ---- Mouse mode ----
 
-        # Exit on modifier combos (except with Enter/Backspace)
+        # Exit on modifier combos (except Enter/Backspace)
         if self.modifiers_held and keycode not in [ecodes.KEY_ENTER, ecodes.KEY_BACKSPACE]:
             if value == 1:
                 print(f"Combo detected (modifier + key) - exiting mouse mode")
@@ -189,6 +230,7 @@ class EventHandler:
                 if self.indicator:
                     self.indicator.set_precision_mode(False)
             self.mouse_ops.base_speed = self.speed_levels[keycode]
+            self._save()
             print(f"Speed: {self.mouse_ops.base_speed}")
             return False
 
@@ -209,6 +251,7 @@ class EventHandler:
             self.mouse_ops.acceleration_enabled = not self.mouse_ops.acceleration_enabled
             if self.indicator:
                 self.indicator.set_acceleration(self.mouse_ops.acceleration_enabled)
+            self._save()
             status = "ON" if self.mouse_ops.acceleration_enabled else "OFF"
             print(f"Acceleration: {status}")
             self.mouse_ops.move_start_time = None

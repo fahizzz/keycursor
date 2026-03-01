@@ -4,8 +4,9 @@ __pycache__/
 *.pyo
 .env
 
-# build elements
 python.test/
 pyrightconfig.json
 requirements.txt
 tests/
+
+settings.json
