@@ -10,13 +10,9 @@ from indicator import TopBarIndicator
 
 class MouseController:
     def __init__(self):
-        print("[CONTROLLER] Initializing...")
         self.keyboard_manager = KeyboardManager()
         self.mouse_ops = MouseOperations()
-
-        print("[CONTROLLER] Starting indicator...")
         self.indicator = TopBarIndicator()
-
         self.event_handler = EventHandler(self.mouse_ops, self.indicator)
 
         initial_keyboards = self.keyboard_manager.find_all_keyboards()
@@ -65,7 +61,6 @@ class MouseController:
                     try:
                         for event in device.read():
                             pass_through = self.event_handler.handle_event(event)
-
                             if pass_through and self.keyboard_manager.ui:
                                 try:
                                     self.keyboard_manager.ui.write_event(event)
